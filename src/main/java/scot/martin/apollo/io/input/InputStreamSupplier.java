@@ -22,13 +22,13 @@ public class InputStreamSupplier implements Supplier<Optional<InputStream>> {
         Optional<InputStream> result = null;
 
         try {
-            LOGGER.info("Creating input stream from " + url);
+            LOGGER.fine("Creating input stream from " + url);
 
             InputStream urlInputStream = new URL(url).openStream();
             InputStream bufferedInputStream = new BufferedInputStream(urlInputStream);
             result = Optional.of(bufferedInputStream);
 
-            LOGGER.info("Input stream created");
+            LOGGER.fine("Input stream created");
         } catch (IOException e) {
             LOGGER.severe("Failed to create input stream: " + e.getMessage());
         }

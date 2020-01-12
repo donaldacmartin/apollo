@@ -18,13 +18,13 @@ public class OutputStreamFunction implements Function<String, Optional<OutputStr
         Optional<OutputStream> result = Optional.empty();
 
         try {
-            LOGGER.info("Creating output stream");
+            LOGGER.fine("Creating output stream");
 
             Path path = Paths.get(fileName);
             FileOutputStream outputStream = new FileOutputStream(path.toFile());
             result = Optional.of(outputStream);
 
-            LOGGER.info("Output stream created");
+            LOGGER.fine("Output stream created");
         } catch (IOException e) {
             LOGGER.severe("Failed to create output stream: " + e.getMessage());
         }

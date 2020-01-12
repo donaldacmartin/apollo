@@ -17,12 +17,12 @@ public class FileNameSupplier implements Supplier<Optional<String>> {
         Optional<String> result = Optional.empty();
 
         try {
-            LOGGER.info("Creating temp file");
+            LOGGER.fine("Creating temp file");
 
             File file = File.createTempFile(DEFAULT_PREFIX, DEFAULT_SUFFIX);
             result = Optional.of(file.getAbsolutePath());
 
-            LOGGER.info("Temp file created");
+            LOGGER.fine("Temp file created");
         } catch (IOException e) {
             LOGGER.severe("Failed to create temp file: " + e.getMessage());
         }

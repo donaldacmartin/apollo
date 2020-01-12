@@ -25,13 +25,16 @@ public class Downloader implements Callable<Optional<String>> {
     private final Function<Long, LocalDateTime> timeFunction;
 
     private final long endTime;
+    private final long maxBytes;
 
-    public Downloader(String url, long duration) {
+    public Downloader(String url, long duration, long maxBytes) {
         this.inputStreamSupplier = new InputStreamSupplier(url);
         this.fileNameSupplier = new FileNameSupplier();
         this.outputStreamFunction = new OutputStreamFunction();
         this.timeFunction = new TimeFunction();
+
         this.endTime = System.currentTimeMillis() + duration;
+        this.maxBytes = maxBytes;
     }
 
     @Override
@@ -65,9 +68,11 @@ public class Downloader implements Callable<Optional<String>> {
 
     private void stream(InputStream inputStream, OutputStream outputStream) throws IOException {
         LOGGER.info("Starting streaming until " + timeFunction.apply(endTime));
+        long bytesRead = 0;
 
-        while (endTime > System.currentTimeMillis()) {
+        while (endTime > System.currentTimeMillis() && bytesRead < maxBytes) {
             outputStream.write(inputStream.read());
+            bytesRead++;
         }
 
         LOGGER.info("Streaming ended");
@@ -79,7 +84,7 @@ public class Downloader implements Callable<Optional<String>> {
             outputStream.flush();
             outputStream.close();
 
-            LOGGER.info("Streams closed");
+            LOGGER.fine("Streams closed");
         } catch (IOException e) {
             LOGGER.severe("Error closing streams: " + e.getMessage());
         }
