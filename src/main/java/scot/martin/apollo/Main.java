@@ -9,11 +9,13 @@ import scot.martin.apollo.worker.Downloader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -39,19 +41,26 @@ public class Main {
         Function<Show, Long> timeTilBroadcastFunction = new TimeTilBroadcastFunction();
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(POOL_SIZE);
 
+        Consumer<Show> scheduleShow = s -> {
+            LOGGER.info("Show " + s.getName() + " can be scheduled");
+
+            Callable<Optional<String>> downloader = new Downloader(s);
+            long delayMillis = timeTilBroadcastFunction.apply(s);
+
+            executorService.schedule(downloader, delayMillis, TimeUnit.MILLISECONDS);
+            LOGGER.info("Show " + s.getName() + " scheduled");
+        };
+
         try {
             while (true) {
                 LOGGER.info("Checking if shows can be scheduled");
 
-                showSupplier.get().parallelStream().filter(upcomingShowPredicate).forEach(s -> {
-                    LOGGER.info("Show " + s.getName() + " can be scheduled");
-
-                    Callable<Optional<String>> downloader = new Downloader(s);
-                    long delayMillis = timeTilBroadcastFunction.apply(s);
-
-                    executorService.schedule(downloader, delayMillis, TimeUnit.MILLISECONDS);
-                    LOGGER.info("Show " + s.getName() + " scheduled");
-                });
+                showSupplier
+                        .get()
+                        .parallelStream()
+                        .filter(Objects::nonNull)
+                        .filter(upcomingShowPredicate)
+                        .forEach(scheduleShow);
 
                 LOGGER.info("Scheduler sleeping...");
                 Thread.sleep(SCHEDULER_SLEEP);
