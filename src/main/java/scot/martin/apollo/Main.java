@@ -23,7 +23,7 @@ public class Main {
 
     private static final Logger LOGGER = Logger.getLogger("Main");
 
-    private static final int SCHEDULER_SLEEP = 5 * 60 * 1000;
+    private static final int SCHEDULER_SLEEP = 10 * 60 * 1000;
     private static final int POOL_SIZE = 10;
 
     public static void main(String[] args) {
@@ -34,7 +34,6 @@ public class Main {
 
         Path csvPath = Paths.get(args[0]);
         Supplier<Collection<Show>> showSupplier = new ShowSupplier(csvPath);
-        Collection<Show> shows = showSupplier.get();
 
         Predicate<Show> upcomingShowPredicate = new UpcomingShowPredicate(SCHEDULER_SLEEP);
         Function<Show, Long> timeTilBroadcastFunction = new TimeTilBroadcastFunction();
@@ -44,7 +43,7 @@ public class Main {
             while (true) {
                 LOGGER.info("Checking if shows can be scheduled");
 
-                shows.parallelStream().filter(upcomingShowPredicate).forEach(s -> {
+                showSupplier.get().parallelStream().filter(upcomingShowPredicate).forEach(s -> {
                     LOGGER.info("Show " + s.getName() + " can be scheduled");
 
                     Callable<Optional<String>> downloader = new Downloader(s);

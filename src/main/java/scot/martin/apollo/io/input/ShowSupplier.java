@@ -39,12 +39,12 @@ public class ShowSupplier implements Supplier<Collection<Show>> {
             try {
                 shows = Files
                         .lines(path)
+                        .skip(1)
                         .map(csvRowSplitFunction)
                         .map(argsShowFunction)
                         .collect(Collectors.toSet());
 
                 LOGGER.info("Read " + shows.size() + " shows");
-                shows.stream().forEach(x -> LOGGER.info(x.toString()));
             } catch (IOException io) {
                 LOGGER.severe("Failed to read shows: " + io.getMessage());
             }
