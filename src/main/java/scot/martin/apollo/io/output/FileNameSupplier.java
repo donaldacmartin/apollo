@@ -9,8 +9,13 @@ import java.util.logging.Logger;
 public class FileNameSupplier implements Supplier<Optional<String>> {
 
     private static final Logger LOGGER = Logger.getLogger("FileNameSupplier");
-    private static final String DEFAULT_PREFIX = "Downloader";
     private static final String DEFAULT_SUFFIX = ".mp3";
+
+    private final String prefix;
+
+    public FileNameSupplier(String prefix) {
+        this.prefix = prefix;
+    }
 
     @Override
     public Optional<String> get() {
@@ -19,7 +24,7 @@ public class FileNameSupplier implements Supplier<Optional<String>> {
         try {
             LOGGER.fine("Creating temp file");
 
-            File file = File.createTempFile(DEFAULT_PREFIX, DEFAULT_SUFFIX);
+            File file = File.createTempFile(prefix, DEFAULT_SUFFIX);
             result = Optional.of(file.getAbsolutePath());
 
             LOGGER.fine("Temp file created");

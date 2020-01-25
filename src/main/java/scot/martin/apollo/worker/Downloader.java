@@ -26,16 +26,16 @@ public class Downloader implements Callable<Optional<String>> {
     private final Function<String, Optional<OutputStream>> outputStreamFunction;
     private final Function<Long, LocalDateTime> timeFunction;
 
-    private final long endTime;
+    private final long durationMillis;
     private final long maxBytes;
 
     public Downloader(Show show) {
         this.inputStreamSupplier = new InputStreamSupplier(show.getUrl());
-        this.fileNameSupplier = new FileNameSupplier();
+        this.fileNameSupplier = new FileNameSupplier(show.getName());
         this.outputStreamFunction = new OutputStreamFunction();
         this.timeFunction = new TimeFunction();
 
-        this.endTime = System.currentTimeMillis() + (show.getMinutes() * 60 * 1000);
+        this.durationMillis = show.getMinutes() * 60 * 1000;
         this.maxBytes = MAX_BYTES;
     }
 
@@ -70,6 +70,7 @@ public class Downloader implements Callable<Optional<String>> {
     }
 
     private void stream(InputStream inputStream, OutputStream outputStream) throws IOException {
+        long endTime = System.currentTimeMillis() + durationMillis;
         LOGGER.info("Starting streaming until " + timeFunction.apply(endTime));
         long bytesRead = 0;
 
