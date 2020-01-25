@@ -1,4 +1,4 @@
-package scot.martin.apollo.timing;
+package scot.martin.apollo.function.timing;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

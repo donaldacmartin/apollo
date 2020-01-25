@@ -1,9 +1,10 @@
 package scot.martin.apollo.worker;
 
+import scot.martin.apollo.function.timing.TimeFunction;
 import scot.martin.apollo.io.input.InputStreamSupplier;
 import scot.martin.apollo.io.output.FileNameSupplier;
 import scot.martin.apollo.io.output.OutputStreamFunction;
-import scot.martin.apollo.timing.TimeFunction;
+import scot.martin.apollo.model.Show;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 public class Downloader implements Callable<Optional<String>> {
 
     private static final Logger LOGGER = Logger.getLogger("Downloader");
+    private static final long MAX_BYTES = 209715200;
 
     private final Supplier<Optional<InputStream>> inputStreamSupplier;
     private final Supplier<Optional<String>> fileNameSupplier;
@@ -27,14 +29,14 @@ public class Downloader implements Callable<Optional<String>> {
     private final long endTime;
     private final long maxBytes;
 
-    public Downloader(String url, long duration, long maxBytes) {
-        this.inputStreamSupplier = new InputStreamSupplier(url);
+    public Downloader(Show show) {
+        this.inputStreamSupplier = new InputStreamSupplier(show.getUrl());
         this.fileNameSupplier = new FileNameSupplier();
         this.outputStreamFunction = new OutputStreamFunction();
         this.timeFunction = new TimeFunction();
 
-        this.endTime = System.currentTimeMillis() + duration;
-        this.maxBytes = maxBytes;
+        this.endTime = System.currentTimeMillis() + (show.getMinutes() * 60 * 1000);
+        this.maxBytes = MAX_BYTES;
     }
 
     @Override
@@ -51,6 +53,7 @@ public class Downloader implements Callable<Optional<String>> {
 
                 try {
                     stream(inputStream, outputStream);
+                    LOGGER.info("Streamed to " + optionalFileName.get());
                 } catch (IOException e) {
                     LOGGER.severe("Error while streaming: " + e.getMessage());
                 } finally {
