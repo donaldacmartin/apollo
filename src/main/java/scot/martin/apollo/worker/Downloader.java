@@ -1,6 +1,7 @@
 package scot.martin.apollo.worker;
 
 import scot.martin.apollo.function.timing.TimeFunction;
+import scot.martin.apollo.io.FileMover;
 import scot.martin.apollo.io.input.InputStreamSupplier;
 import scot.martin.apollo.io.output.FileNameSupplier;
 import scot.martin.apollo.io.output.OutputStreamFunction;
@@ -9,9 +10,12 @@ import scot.martin.apollo.model.Show;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -20,11 +24,13 @@ public class Downloader implements Callable<Optional<String>> {
 
     private static final Logger LOGGER = Logger.getLogger("Downloader");
     private static final long MAX_BYTES = 209715200;
+    private static final Path DESTINATION = Paths.get("/var/www/html");
 
     private final Supplier<Optional<InputStream>> inputStreamSupplier;
     private final Supplier<Optional<String>> fileNameSupplier;
     private final Function<String, Optional<OutputStream>> outputStreamFunction;
     private final Function<Long, LocalDateTime> timeFunction;
+    private final Consumer<Path> fileMover;
 
     private final long durationMillis;
     private final long maxBytes;
@@ -34,6 +40,7 @@ public class Downloader implements Callable<Optional<String>> {
         this.fileNameSupplier = new FileNameSupplier(show.getName());
         this.outputStreamFunction = new OutputStreamFunction();
         this.timeFunction = new TimeFunction();
+        this.fileMover = new FileMover(DESTINATION);
 
         this.durationMillis = show.getMinutes() * 60 * 1000;
         this.maxBytes = MAX_BYTES;
@@ -54,6 +61,7 @@ public class Downloader implements Callable<Optional<String>> {
                 try {
                     stream(inputStream, outputStream);
                     LOGGER.info("Streamed to " + optionalFileName.get());
+                    fileMover.accept(Paths.get(optionalFileName.get()));
                 } catch (IOException e) {
                     LOGGER.severe("Error while streaming: " + e.getMessage());
                 } finally {
