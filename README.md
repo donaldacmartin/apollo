@@ -22,13 +22,13 @@ in a CSV file described below.
 
 ## Usage
 
-To record a stream from _example.com_ for 10 minutes:
+To record a streams stored in the *shows.csv* file:
 
 `java -jar output.jar /home/user/shows.csv`
 
 ## CSV File Format
 
-| Show Name     | Start Time | Time Zone       | Duration (mins) | URL                                   |
-|-------------- | ---------- | --------------- | --------------- | ------------------------------------- |
-| MorningShow   | 06:00      | America/Toronto | 60              | https://example.com/morningstream.mp3 |
-| EveningEurope | 18:00      | Europe/Paris    | 120             | https://example.com/eveningstream.mp3 |
+| Show Name     | Start Time | Time Zone       | Mon | Tue | Wed | Thu | Fri | Sat | Sun | Duration (mins) | URL                                   |
+|-------------- | ---------- | --------------- | --- | --- | --- | --- | --- | --- | --- | --------------- | ------------------------------------- |
+| MorningShow   | 06:00      | America/Toronto | Y   | Y   | Y   | Y   | Y   | N   | N   | 60              | https://example.com/morningstream.mp3 |
+| EveningEurope | 18:00      | Europe/Paris    | Y   | N   | Y   | N   | Y   | N   | N   | 120             | https://example.com/eveningstream.mp3 |
