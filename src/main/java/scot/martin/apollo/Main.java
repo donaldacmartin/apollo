@@ -5,6 +5,7 @@ import scot.martin.apollo.io.input.ShowSupplier;
 import scot.martin.apollo.model.Show;
 import scot.martin.apollo.predicate.UpcomingShowPredicate;
 import scot.martin.apollo.worker.Downloader;
+import scot.martin.apollo.worker.maintenance.JanitorThread;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +51,8 @@ public class Main {
             executorService.schedule(downloader, delayMillis, TimeUnit.MILLISECONDS);
             LOGGER.info("Show " + s.getName() + " scheduled");
         };
+
+        executorService.schedule(JanitorThread.create(), 0, TimeUnit.MILLISECONDS);
 
         try {
             while (true) {
