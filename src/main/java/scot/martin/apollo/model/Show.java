@@ -48,6 +48,10 @@ public class Show implements Serializable {
         return minutes;
     }
 
+    public long getMillis() {
+        return minutes * 60 * 1000;
+    }
+
     public String getUrl() {
         return url;
     }

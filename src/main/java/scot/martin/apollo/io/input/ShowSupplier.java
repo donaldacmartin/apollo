@@ -1,6 +1,5 @@
 package scot.martin.apollo.io.input;
 
-import scot.martin.apollo.function.transformer.ArgsShowFunction;
 import scot.martin.apollo.model.Show;
 
 import java.io.File;

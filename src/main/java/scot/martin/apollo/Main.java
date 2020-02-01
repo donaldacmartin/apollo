@@ -1,11 +1,11 @@
 package scot.martin.apollo;
 
-import scot.martin.apollo.function.transformer.TimeTilBroadcastFunction;
+import scot.martin.apollo.scheduling.function.TimeUntilBroadcastFunction;
 import scot.martin.apollo.io.input.ShowSupplier;
 import scot.martin.apollo.model.Show;
-import scot.martin.apollo.predicate.UpcomingShowPredicate;
-import scot.martin.apollo.worker.Downloader;
-import scot.martin.apollo.worker.maintenance.JanitorThread;
+import scot.martin.apollo.scheduling.predicate.UpcomingShowPredicate;
+import scot.martin.apollo.thread.DownloadThread;
+import scot.martin.apollo.thread.JanitorThread;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,20 +39,20 @@ public class Main {
         Supplier<Collection<Show>> showSupplier = new ShowSupplier(csvPath);
 
         Predicate<Show> upcomingShowPredicate = new UpcomingShowPredicate(SCHEDULER_SLEEP);
-        Function<Show, Long> timeTilBroadcastFunction = new TimeTilBroadcastFunction();
+        Function<Show, Long> timeTilBroadcastFunction = new TimeUntilBroadcastFunction();
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(POOL_SIZE);
 
         Consumer<Show> scheduleShow = s -> {
             LOGGER.info("Show " + s.getName() + " can be scheduled");
 
-            Callable<Optional<String>> downloader = new Downloader(s);
+            Callable<Optional<Path>> downloadThread = new DownloadThread(s);
             long delayMillis = timeTilBroadcastFunction.apply(s);
 
-            executorService.schedule(downloader, delayMillis, TimeUnit.MILLISECONDS);
+            executorService.schedule(downloadThread, delayMillis, TimeUnit.MILLISECONDS);
             LOGGER.info("Show " + s.getName() + " scheduled");
         };
 
-        executorService.schedule(JanitorThread.create(), 0, TimeUnit.MILLISECONDS);
+        executorService.schedule(new JanitorThread(), 0, TimeUnit.MILLISECONDS);
 
         try {
             while (true) {

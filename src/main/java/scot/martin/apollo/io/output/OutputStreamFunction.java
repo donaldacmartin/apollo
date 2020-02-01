@@ -4,29 +4,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-public class OutputStreamFunction implements Function<String, Optional<OutputStream>> {
+public class OutputStreamFunction implements Function<Optional<Path>, Optional<OutputStream>> {
 
     private static final Logger LOGGER = Logger.getLogger("OutputStreamFunction");
 
     @Override
-    public Optional<OutputStream> apply(String fileName) {
+    public Optional<OutputStream> apply(Optional<Path> path) {
         Optional<OutputStream> result = Optional.empty();
 
-        try {
-            LOGGER.fine("Creating output stream");
+        if (path != null || path.isEmpty()) {
+            try {
+                LOGGER.fine("Creating output stream");
 
-            Path path = Paths.get(fileName);
-            FileOutputStream outputStream = new FileOutputStream(path.toFile());
-            result = Optional.of(outputStream);
+                FileOutputStream outputStream = new FileOutputStream(path.get().toFile());
+                result = Optional.of(outputStream);
 
-            LOGGER.fine("Output stream created");
-        } catch (IOException e) {
-            LOGGER.severe("Failed to create output stream: " + e.getMessage());
+                LOGGER.fine("Output stream created");
+            } catch (IOException e) {
+                LOGGER.severe("Failed to create output stream: " + e.getMessage());
+            }
+        } else {
+            LOGGER.warning("Cannot create output stream without path");
         }
 
         return result;
