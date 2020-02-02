@@ -1,19 +1,23 @@
 package scot.martin.apollo;
 
-import scot.martin.apollo.scheduling.function.TimeUntilBroadcastFunction;
 import scot.martin.apollo.io.input.ShowSupplier;
+import scot.martin.apollo.model.BroadcastDownload;
 import scot.martin.apollo.model.Show;
+import scot.martin.apollo.scheduling.function.TimeUntilBroadcastFunction;
 import scot.martin.apollo.scheduling.predicate.UpcomingShowPredicate;
 import scot.martin.apollo.thread.DownloadThread;
 import scot.martin.apollo.thread.JanitorThread;
+import scot.martin.apollo.thread.TelegramThread;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -41,11 +45,12 @@ public class Main {
         Predicate<Show> upcomingShowPredicate = new UpcomingShowPredicate(SCHEDULER_SLEEP);
         Function<Show, Long> timeTilBroadcastFunction = new TimeUntilBroadcastFunction();
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(POOL_SIZE);
+        BlockingQueue<BroadcastDownload> downloadQueue = new LinkedBlockingQueue<>();
 
         Consumer<Show> scheduleShow = s -> {
             LOGGER.info("Show " + s.getName() + " can be scheduled");
 
-            Callable<Optional<Path>> downloadThread = new DownloadThread(s);
+            Callable<Optional<Path>> downloadThread = new DownloadThread(s, downloadQueue);
             long delayMillis = timeTilBroadcastFunction.apply(s);
 
             executorService.schedule(downloadThread, delayMillis, TimeUnit.MILLISECONDS);
@@ -53,6 +58,7 @@ public class Main {
         };
 
         executorService.schedule(new JanitorThread(), 0, TimeUnit.MILLISECONDS);
+        executorService.schedule(new TelegramThread(downloadQueue), 0, TimeUnit.MILLISECONDS);
 
         try {
             while (true) {

@@ -19,7 +19,17 @@
         <source.target.version>13</source.target.version>
 
         <checkstyle.version>3.1.0</checkstyle.version>
+        <json.version>20190722</json.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
         <plugins>
@@ -37,7 +47,7 @@
                     <target>${source.target.version}</target>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
-                        <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-module</arg>
                         <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
