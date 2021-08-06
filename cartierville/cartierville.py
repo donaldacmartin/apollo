@@ -1,3 +1,11 @@
+"""cartierville.cartierville
+
+Utility to save radio streams to local files
+
+Functions:
+    main(str, int, str) -> str
+"""
+
 from argparse import ArgumentParser
 from logging import INFO, basicConfig, info, error
 from shutil import move
@@ -16,7 +24,7 @@ class CartiervilleException(Exception):
     """Base exception for this project"""
 
 
-def get_arg_parser() -> ArgumentParser:
+def _get_arg_parser() -> ArgumentParser:
     argparser = ArgumentParser()
 
     argparser.add_argument(
@@ -35,6 +43,8 @@ def get_arg_parser() -> ArgumentParser:
 
 
 def main(url: str, duration: int, output_dir: str) -> str:
+    """Save a stream to a temp file, then move to the output directory"""
+
     try:
         end_time = time() + duration
         downloaded_bytes = 0
@@ -53,16 +63,16 @@ def main(url: str, duration: int, output_dir: str) -> str:
 
         info("Moving %s to %s" % (tmp_file.name, output_dir))
         return move(tmp_file.name, output_dir)
-    except EnvironmentError as env_error:
-        error("Environment error encountered: %s" % env_error)
-        raise CartiervilleException("Error saving to temp file") from env_error
     except RequestException as req_exception:
         error("Request error encountered: %s" % req_exception)
         raise CartiervilleException("Error streaming") from req_exception
+    except EnvironmentError as env_error:
+        error("Environment error encountered: %s" % env_error)
+        raise CartiervilleException("Error saving to temp file") from env_error
 
 
 if __name__ == "__main__":
     basicConfig(format=LOG_FORMAT, level=INFO)
-    arg_parser = get_arg_parser()
+    arg_parser = _get_arg_parser()
     args = arg_parser.parse_args()
     main(args.url, args.duration, args.output_dir)
