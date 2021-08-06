@@ -1,6 +1,12 @@
 # Cartierville
 
+[![Build Status](https://ci.donald-martin.ca/buildStatus/icon?job=cartierville%2Fmain)](https://ci.donald-martin.ca/job/cartierville/job/main/)
+
 Utility to stream radio and save to a local file
+
+## Requirements
+
+- Python 3.7 or higher
 
 ## Installation
 
