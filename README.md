@@ -1,6 +1,8 @@
 # Cartierville
 
 [![Build Status](https://ci.donald-martin.ca/buildStatus/icon?job=cartierville%2Fmain)](https://ci.donald-martin.ca/job/cartierville/job/main/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 Utility to stream radio and save to a local file
 
