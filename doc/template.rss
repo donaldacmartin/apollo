@@ -1,0 +1,18 @@
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+    <channel>
+        <title>Cartierville</title>
+        <link>http://www.yourwebsite.com</link>
+        <language>fr-ca</language>
+        <itunes:subtitle>Radio-to-RSS</itunes:subtitle>
+        <itunes:author>Your name</itunes:author>
+        <itunes:summary>Summary</itunes:summary>
+        <description>Description</description>
+        <itunes:owner>
+            <itunes:name>Your name</itunes:name>
+            <itunes:email>Your email address</itunes:email>
+        </itunes:owner>
+        <itunes:explicit>no</itunes:explicit>
+        <itunes:image href="http://www.example.com/podcast-icon.jpg" />
+        <itunes:category text="Category" />
+    </channel>
+</rss>

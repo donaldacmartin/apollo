@@ -6,73 +6,39 @@ Functions:
     main(str, int, str) -> str
 """
 
-from argparse import ArgumentParser
 from logging import INFO, basicConfig, info, error
+from os.path import basename, join
 from shutil import move
-from tempfile import NamedTemporaryFile
-from time import time
 
-from requests import RequestException, get
-
+from cartierville.args import get_arg_parser
+from cartierville.model import CartiervilleException, PodcastDTO
+from cartierville.rss import update_rss
+from cartierville.stream import stream_to_tmp_file
 
 LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
-BUFFER_SIZE = 1024
-MAX_BYTES_SIZE = 1024 * 1024 * 300
 
 
-class CartiervilleException(Exception):
-    """Base exception for this project"""
-
-
-def _get_arg_parser() -> ArgumentParser:
-    argparser = ArgumentParser()
-
-    argparser.add_argument(
-        "--url", type=str, required=True, help="Stream location to save"
-    )
-
-    argparser.add_argument(
-        "--duration", type=int, required=True, help="Duration in seconds"
-    )
-
-    argparser.add_argument(
-        "--output-dir", type=str, required=True, help="Output location"
-    )
-
-    return argparser
-
-
-def main(url: str, duration: int, output_dir: str) -> str:
+def main(podcast: PodcastDTO, duration: int, output_dir: str, uri_path: str):
     """Save a stream to a temp file, then move to the output directory"""
 
     try:
-        end_time = time() + duration
-        downloaded_bytes = 0
+        tmp_file, file_size = stream_to_tmp_file(podcast.url, duration)
 
-        with NamedTemporaryFile(delete=False) as tmp_file:
-            info("Temp file created at %s" % tmp_file.name)
+        info("Moving %s to %s" % (tmp_file, output_dir))
+        move(tmp_file, output_dir)
 
-            with get(url, stream=True) as req:
-                info("Stream opened from %s for %d seconds" % (url, duration))
-
-                while time() < end_time and downloaded_bytes <= MAX_BYTES_SIZE:
-                    tmp_file.write(req.raw.read(BUFFER_SIZE))
-                    downloaded_bytes += BUFFER_SIZE
-
-                info("Stream completed after %d bytes" % downloaded_bytes)
-
-        info("Moving %s to %s" % (tmp_file.name, output_dir))
-        return move(tmp_file.name, output_dir)
-    except RequestException as req_exception:
-        error("Request error encountered: %s" % req_exception)
-        raise CartiervilleException("Error streaming") from req_exception
-    except EnvironmentError as env_error:
-        error("Environment error encountered: %s" % env_error)
-        raise CartiervilleException("Error saving to temp file") from env_error
+        info("Updating RSS file")
+        rss_path = join(output_dir, "feed.xml")
+        link = uri_path + "/" + basename(tmp_file)
+        update_rss(rss_path, podcast, link, duration, file_size)
+    except CartiervilleException as cartierville_exception:
+        error("Error encountered: %s" % cartierville_exception)
+        raise cartierville_exception
 
 
 if __name__ == "__main__":
     basicConfig(format=LOG_FORMAT, level=INFO)
-    arg_parser = _get_arg_parser()
+    arg_parser = get_arg_parser()
     args = arg_parser.parse_args()
-    main(args.url, args.duration, args.output_dir)
+    podcast_req = PodcastDTO(args.title, args.summary, args.author, args.url)
+    main(podcast_req, args.duration, args.output_dir, args.output_uri)
