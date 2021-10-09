@@ -16,6 +16,7 @@ from cartierville.model import PodcastDTO, RSSException
 
 ITUNES_NAMESPACE = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 MAX_KEEP_ITEMS = 5
+ICONS = ["icon.jpg", "icon.png"]
 
 
 def _serialise_duration(duration: int) -> str:
@@ -63,7 +64,10 @@ def _delete_files_not_in_list(channel: ElementTree, rss_location: str) -> None:
 
     items = channel.findall("item")
     links = [item.find("link").text for item in items]
-    expected_filenames = set([link.split("/")[-1] for link in links] + [rss_file])
+
+    expected_filenames = set(
+        [link.split("/")[-1] for link in links] + [rss_file] + ICONS
+    )
 
     files_to_delete = list(dir_files.difference(expected_filenames))
     paths_to_delete = [join(rss_dir, filename) for filename in files_to_delete]
