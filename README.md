@@ -28,3 +28,9 @@ python3 -m \
     --duration 60 \
     --output-dir ./
 ```
+
+## To Do
+
+- Config validation
+- Linting
+- Unit tests

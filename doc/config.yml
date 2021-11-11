@@ -1,0 +1,18 @@
+outputs:
+  donald:
+    directory: ./test
+    uri: "https://example.com"
+shows:
+  - title: EuroHot 30
+    summary: "Le classement des 30 hits les plus diffusés sur l'ensemble des stations NRJ"
+    author: NRJ France
+    url: "https://f5-pa6.nrjaudio.fm/fr/30001/aac_64.mp3?origine=playernrj&aw_0_req.userConsentV2=&aw_0_1st.station=&cdn_path=audio_lbs10&access_token=3080078a21004140b55281b7d70535fc"
+    duration: 5
+    days:
+      - monday
+      - tuesday
+      - wednesday
+      - thursday
+      - friday
+    time: "06:12"
+    output: donald
