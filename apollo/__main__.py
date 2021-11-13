@@ -1,4 +1,4 @@
-"""cartierville.cartierville
+"""apollo.__main__
 
 Utility to save radio streams to local files
 
@@ -11,9 +11,9 @@ from time import sleep
 
 from schedule import idle_seconds, run_pending
 
-from cartierville.config import read_shows
-from cartierville.job import schedule_show
-from cartierville.model import LOG_FORMAT
+from apollo.config import read_shows
+from apollo.job import schedule_show
+from apollo.model import LOG_FORMAT
 
 
 def main():

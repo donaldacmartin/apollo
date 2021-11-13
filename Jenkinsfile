@@ -17,11 +17,8 @@ pipeline {
             }
         }
         stage('Linting') {
-            when {
-                branch 'main'
-            }
             steps {
-                sh 'python3 -m poetry run pylint cartierville'
+                sh 'python3 -m poetry run pylint apollo'
             }
         }
         stage('Build') {

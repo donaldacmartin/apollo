@@ -1,4 +1,4 @@
-"""podcast.stream
+"""apollo.stream
 
 Handles streaming to a temporary file
 
@@ -13,7 +13,7 @@ from typing import Tuple
 
 from requests import RequestException, get
 
-from cartierville.model import StreamException, Show
+from apollo.model import StreamException, Show
 
 BUFFER_SIZE = 1024
 MAX_BYTES_SIZE = 1024 * 1024 * 300

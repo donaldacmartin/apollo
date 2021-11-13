@@ -1,4 +1,4 @@
-"""cartierville.job
+"""apollo.job
 
 Schedules jobs by creating a process for each one.
 
@@ -14,9 +14,9 @@ from shutil import move
 
 from schedule import every
 
-from cartierville.model import LOG_FORMAT, CartiervilleException, Show
-from cartierville.rss import update_rss
-from cartierville.stream import stream_to_tmp_file
+from apollo.model import LOG_FORMAT, ApolloException, Show
+from apollo.rss import update_rss
+from apollo.stream import stream_to_tmp_file
 
 
 def _job(show: Show) -> None:
@@ -31,8 +31,8 @@ def _job(show: Show) -> None:
 
         info("Updating RSS file")
         update_rss(show, basename(tmp_file), file_size)
-    except CartiervilleException as cartierville_exception:
-        error(f"Error encountered: {cartierville_exception}")
+    except ApolloException as apollo_exception:
+        error(f"Error encountered: {apollo_exception}")
 
 
 def _run_proc(show: Show) -> None:

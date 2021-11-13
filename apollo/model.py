@@ -1,31 +1,36 @@
-"""cartierville.model
+"""apollo.model
 
 Exceptions & classes for the application
 
-classes:
-    CartiervilleException
+Classes:
+    ApolloException
     StreamException
     RSSException
 
-    PodcastDTO
+    Output
+    Show
+
+Constants:
+    CONFIG_SCHEMA
+    SAMPLE_RSS
 """
 
 from typing import List, NamedTuple
 
 
-class CartiervilleException(Exception):
+class ApolloException(Exception):
     """Base exception for this project"""
 
 
-class ConfigException(CartiervilleException):
+class ConfigException(ApolloException):
     """Errors thrown during the config setup"""
 
 
-class StreamException(CartiervilleException):
+class StreamException(ApolloException):
     """Exceptions raised during the streaming process"""
 
 
-class RSSException(CartiervilleException):
+class RSSException(ApolloException):
     """Exceptions raised while updating the XML file"""
 
 
@@ -91,7 +96,7 @@ CONFIG_SCHEMA = {
 SAMPLE_RSS = """
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
     <channel>
-        <title>Cartierville</title>
+        <title>Apollo</title>
         <link>http://www.yourwebsite.com</link>
         <language>fr-ca</language>
         <itunes:subtitle>Radio-to-RSS</itunes:subtitle>

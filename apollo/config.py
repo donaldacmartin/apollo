@@ -1,4 +1,4 @@
-"""cartierville.config
+"""apollo.config
 
 Parses and validates the config YAML file.
 
@@ -13,7 +13,7 @@ from yaml import YAMLError, safe_load
 
 from cerberus import Validator
 
-from cartierville.model import CONFIG_SCHEMA, ConfigException, Output, Show
+from apollo.model import CONFIG_SCHEMA, ConfigException, Output, Show
 
 
 def _is_valid(yaml_dict: dict) -> bool:

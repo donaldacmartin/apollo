@@ -1,4 +1,4 @@
-"""podcast.rss
+"""apollo.rss
 
 Update the XML file for RSS clients
 
@@ -19,7 +19,7 @@ from xml.etree.ElementTree import (
     register_namespace,
 )
 
-from cartierville.model import SAMPLE_RSS, RSSException, Show
+from apollo.model import SAMPLE_RSS, RSSException, Show
 
 ITUNES_NAMESPACE = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 MAX_KEEP_ITEMS = 5
