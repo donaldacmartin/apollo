@@ -15,7 +15,7 @@ Constants:
     SAMPLE_RSS
 """
 
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Union
 
 
 class ApolloException(Exception):
@@ -41,14 +41,26 @@ class Output(NamedTuple):
     uri: str
 
 
+class MP3Source(NamedTuple):
+    """A source streamed directly from a URL as it airs"""
+
+    url: str
+    duration: int
+
+
+class SoundCloudSource(NamedTuple):
+    """Stream from the Soundcloud API"""
+
+    url: str
+
+
 class Show(NamedTuple):
     """A show to save"""
 
     title: str
     summary: str
     author: str
-    url: str
-    duration: int
+    source: Union[MP3Source, SoundCloudSource]
     days: List[str]
     start_time: str
     output: Output
@@ -62,14 +74,27 @@ _OUTPUTS_SCHEMA = {
     "schema": {"directory": {"type": "string"}, "uri": {"type": "string"}},
 }
 
+_SOURCE_SCHEMA = {
+    "mp3_url": {"type": "string", "excludes": "soundcloud_url"},
+    "mp3_duration": {
+        "type": "number",
+        "min": 0,
+        "max": 10800,
+        "excludes": "soundcloud_url",
+    },
+    "soundcloud_url": {
+        "type": "string",
+        "excludes": ["mp3_url", "mp3_duration"],
+    },
+}
+
 _SHOWS_SCHEMA = {
     "type": "dict",
     "schema": {
         "title": {"type": "string"},
         "summary": {"type": "string"},
         "author": {"type": "string"},
-        "url": {"type": "string"},
-        "duration": {"type": "number", "min": 0, "max": 10800},
+        "source": {"type": "dict", "schema": _SOURCE_SCHEMA},
         "days": {
             "type": "list",
             "allowed": [

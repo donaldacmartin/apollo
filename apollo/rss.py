@@ -10,6 +10,7 @@ from email.utils import formatdate
 from os import R_OK, W_OK, access, chmod, listdir, remove
 from os.path import basename, dirname, exists, join
 from time import gmtime, strftime
+from typing import Union
 from uuid import uuid4
 from xml.etree.ElementTree import (
     ElementTree,
@@ -19,11 +20,12 @@ from xml.etree.ElementTree import (
     register_namespace,
 )
 
-from apollo.model import SAMPLE_RSS, RSSException, Show
+from apollo.model import SAMPLE_RSS, MP3Source, RSSException, Show, SoundCloudSource
 
 ITUNES_NAMESPACE = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 MAX_KEEP_ITEMS = 5
 ICONS = ["icon.jpg", "icon.png"]
+DEFAULT_TIME = "01:00:00"
 
 
 def _get_xml(filename: str) -> ElementTree:
@@ -40,8 +42,11 @@ def _get_xml(filename: str) -> ElementTree:
         raise RSSException(f"File {filename} is not read/writable")
 
 
-def _serialise_duration(duration: int) -> str:
-    return strftime("%H:%M:%S", gmtime(duration))
+def _serialise_duration(source: Union[MP3Source, SoundCloudSource]) -> str:
+    if isinstance(source, MP3Source):
+        return strftime("%H:%M:%S", gmtime(source.duration))
+
+    return DEFAULT_TIME
 
 
 def _add_element(parent: ElementTree, name: str, text: str) -> None:
@@ -63,7 +68,7 @@ def _add_item(channel: ElementTree, show: Show, filename: str, file_size: int) -
     _add_element(item, "link", link)
     _add_element(item, "pubDate", formatdate())
     _add_element(item, "itunes:author", show.author)
-    _add_element(item, "itunes:duration", _serialise_duration(show.duration))
+    _add_element(item, "itunes:duration", _serialise_duration(show.source))
     _add_element(item, "itunes:explicit", "no")
     _add_element(item, "guid", str(uuid4()))
     _add_enclosure(item, link, file_size)

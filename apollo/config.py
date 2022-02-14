@@ -8,12 +8,19 @@ Functions:
 
 from os import R_OK, W_OK, access
 from os.path import exists
-from typing import Dict, List
+from typing import Dict, List, Union
 from yaml import YAMLError, safe_load
 
 from cerberus import Validator
 
-from apollo.model import CONFIG_SCHEMA, ConfigException, Output, Show
+from apollo.model import (
+    CONFIG_SCHEMA,
+    ConfigException,
+    MP3Source,
+    Output,
+    Show,
+    SoundCloudSource,
+)
 
 
 def _is_valid(yaml_dict: dict) -> bool:
@@ -52,14 +59,25 @@ def _read_yaml(filename: str) -> dict:
     raise ConfigException(f"File {filename} does not exist")
 
 
+def _to_source(show: dict) -> Union[MP3Source, SoundCloudSource]:
+    show_source = show["source"] if "source" in show else {}
+
+    if "mp3_url" in show_source and "mp3_duration" in show_source:
+        return MP3Source(show_source["mp3_url"], show_source["mp3_duration"])
+
+    if "soundcloud_url" in show_source:
+        return SoundCloudSource(show_source["soundcloud_url"])
+
+    raise ConfigException(f"Source {show_source} is not valid")
+
+
 def _to_show(show: dict, outputs: Dict[str, Output]) -> Show:
     if show["output"] in outputs:
         return Show(
             show["title"],
             show["summary"],
             show["author"],
-            show["url"],
-            int(show["duration"]),
+            _to_source(show),
             show["days"],
             show["time"],
             outputs[show["output"]],
